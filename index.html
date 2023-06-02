@@ -113,8 +113,21 @@ const renderComments = () => {
     }
   };
 
+  // Добавляем обработчик клика на комментарий (ответ на комментарий)
+
+  const initAnswer = () => {
+    const commentsElements = document.querySelectorAll(".comment");
+    for (const commentElement of commentsElements) {
+      commentElement.addEventListener('click', () => {
+        commentInputElement.value = `> ${commentElement.querySelector('.comment-text').innerHTML}`
+          + `\n\n${commentElement.querySelector('.comment-header').children[0].innerHTML}`
+      })
+    }
+  };
+
   listElement.innerHTML = commentsHtml;
   like();
+  initAnswer();
 };
     
 renderComments();
@@ -132,8 +145,16 @@ buttonElement.addEventListener("click", () => {
   }
 
   comments.push({
-    name: nameInputElement.value,
-    textComment: commentInputElement.value,
+    name: nameInputElement.value
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;"),
+    textComment: commentInputElement.value
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;"),
     date: formatDate,
     likes: 0,
     isActiveLike: false,
