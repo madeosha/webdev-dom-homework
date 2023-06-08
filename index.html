@@ -1,82 +1,85 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-    <title>Проект "Комменты"</title>
-    <meta charset="utf-8" />
-    <link rel="stylesheet" href="styles.css" />
+  <title>Проект "Комменты"</title>
+  <meta charset="utf-8" />
+  <link rel="stylesheet" href="styles.css" />
 </head>
 
 <body>
-    <div class="container">
-      <ul id="list" class="comments">
-        <!--Список рендерится в JS-->
-      </ul>
-      <div class="add-form">
-        <input
-          type="text"
-          id="name-input"
-          class="add-form-name"
-          placeholder="Введите ваше имя"
-        />
-        <textarea
-          type="textarea"
-          id="comment-input"
-          class="add-form-text"
-          placeholder="Введите ваш коментарий"
-          rows="4"
-        ></textarea>
-        <div class="add-form-row">
-          <button class="add-form-button" id="add-button">Написать</button>
-        </div>
+  <div class="container">
+    <ul id="list" class="comments">
+      <!--Список рендерится в JS-->
+    </ul>
+    <div class="add-form">
+      <input type="text" id="name-input" class="add-form-name" placeholder="Введите ваше имя" />
+      <textarea type="textarea" id="comment-input" class="add-form-text" placeholder="Введите ваш коментарий"
+        rows="4"></textarea>
+      <div class="add-form-row">
+        <button class="add-form-button" id="add-button">Написать</button>
       </div>
     </div>
+  </div>
 </body>
 <style>
-    .error {
-      background-color: red;
-    }
-    .new {
-      color: #ff2600;  
-    }
+  .error {
+    background-color: red;
+  }
+
+  .new {
+    color: #ff2600;
+  }
 </style>
 <script>
-"use strict";
+  "use strict";
 
-// Получаем доступ к разметке html в JS
+  // Получаем доступ к разметке html в JS
 
-const date = document.getElementById("current_date_time_block");
-const buttonElement = document.getElementById("add-button");
-const nameInputElement = document.getElementById("name-input");
-const commentInputElement = document.getElementById("comment-input");
-const listElement = document.getElementById("list");
-    
-const comments = [
-  {
-    name: "Глеб Фокин",
-    date: "12.02.22 12:18",
-    textComment: "Это будет первый комментарий на этой странице",
-    likes: 3,
-    isActiveLike: false,
-  },
-  {
-    name: "Варвара Н.",
-    date: "13.02.22 19:22",
-    textComment: "Мне нравится как оформлена эта страница! ❤",
-    likes: 75,
-    isActiveLike: false,
-  },
-];
 
-// Создаём рендер-функцию для добавления разметки html в JS
+  const buttonElement = document.getElementById("add-button");
+  const nameInputElement = document.getElementById("name-input");
+  const commentInputElement = document.getElementById("comment-input");
+  const listElement = document.getElementById("list");
 
-const renderComments = () => {
+  // Получаем данные из API
 
-  const commentsHtml = comments.map((comment, index) => {
-    let likeActive = '';
-    if (comments[index].isActiveLike) {
-      likeActive = '-active-like';
+  let comments = [];
+
+  const fetchPromise = fetch(
+    "https://wedev-api.sky.pro/api/v1/elena-kozlova/comments",
+    {
+      method: "GET"
     }
-    return `<li class="comment">
+  );
+  fetchPromise.then((response) => {
+    const jsonPromise = response.json();
+    jsonPromise.then((responseData) => {
+      const appComments = responseData.comments.map((comment) => {
+        const dateComment = new Date(comment.date);
+        return {
+          name: comment.author.name,
+          date: functionDate(),
+          textComment: comment.text,
+          likes: comment.likes,
+          isActiveLike: false
+        }
+      })
+      comments = appComments;
+      renderComments();
+    })
+  });
+
+  // Создаём рендер-функцию для добавления разметки html в JS
+
+  const renderComments = () => {
+
+    const commentsHtml = comments.map((comment, index) => {
+      let likeActive = '';
+      if (comments[index].isActiveLike) {
+        likeActive = '-active-like';
+      }
+      return `<li class="comment">
       <div class="comment-header">
         <div>${comment.name}</div>
         <div>${comment.date}</div>
@@ -91,89 +94,94 @@ const renderComments = () => {
         </div>
       </div>
       </li>`;
-  }).join('');
+    }).join('');
 
-  // Добавляем функцию активности лайка
+    // Добавляем функцию активности лайка
 
-  const like = () => {
-    const likeButtons = document.querySelectorAll('.likes-button');
-    for (const likeButton of likeButtons) {
-      likeButton.addEventListener('click', (e) => {
-        e.stopPropagation()
-        const index = likeButton.dataset.index;
-        if (comments[index].isActiveLike) {
-          comments[index].likes--;
+    const like = () => {
+      const likeButtons = document.querySelectorAll('.likes-button');
+      for (const likeButton of likeButtons) {
+        likeButton.addEventListener('click', (e) => {
+          e.stopPropagation()
+          const index = likeButton.dataset.index;
+          if (comments[index].isActiveLike) {
+            comments[index].likes--;
 
-        } else {
-          comments[index].likes++;
-        }
-        comments[index].isActiveLike = !comments[index].isActiveLike;
-        renderComments();
-      })
-    }
+          } else {
+            comments[index].likes++;
+          }
+          comments[index].isActiveLike = !comments[index].isActiveLike;
+          renderComments();
+        })
+      }
+    };
+
+    // Добавляем обработчик клика на комментарий (ответ на комментарий)
+
+    const initAnswer = () => {
+      const commentsElements = document.querySelectorAll(".comment");
+      for (const commentElement of commentsElements) {
+        commentElement.addEventListener('click', () => {
+          commentInputElement.value = `> ${commentElement.querySelector('.comment-text').innerHTML}`
+            + `\n\n${commentElement.querySelector('.comment-header').children[0].innerHTML}`
+        })
+      }
+    };
+
+    listElement.innerHTML = commentsHtml;
+    like();
+    initAnswer();
   };
 
-  // Добавляем обработчик клика на комментарий (ответ на комментарий)
-
-  const initAnswer = () => {
-    const commentsElements = document.querySelectorAll(".comment");
-    for (const commentElement of commentsElements) {
-      commentElement.addEventListener('click', () => {
-        commentInputElement.value = `> ${commentElement.querySelector('.comment-text').innerHTML}`
-          + `\n\n${commentElement.querySelector('.comment-header').children[0].innerHTML}`
-      })
-    }
-  };
-
-  listElement.innerHTML = commentsHtml;
-  like();
-  initAnswer();
-};
-    
-renderComments();
-
-buttonElement.addEventListener("click", () => {
-  nameInputElement.classList.remove("error");
-  commentInputElement.classList.remove("error");
-  if (nameInputElement.value === "" ) {
-    nameInputElement.classList.add("error");
-    return;
-  }
-  if (commentInputElement.value === "") {
-    commentInputElement.classList.add("error");
-    return;
-  }
-
-  comments.push({
-    name: nameInputElement.value
-          .replaceAll("&", "&amp;")
-          .replaceAll("<", "&lt;")
-          .replaceAll(">", "&gt;")
-          .replaceAll('"', "&quot;"),
-    textComment: commentInputElement.value
-          .replaceAll("&", "&amp;")
-          .replaceAll("<", "&lt;")
-          .replaceAll(">", "&gt;")
-          .replaceAll('"', "&quot;"),
-    date: formatDate,
-    likes: 0,
-    isActiveLike: false,
-  });
-      
-  nameInputElement.value = "";
-  commentInputElement.value = "";
   renderComments();
-  like();
-    
-});
 
-// Добавляем дату нового комментария
 
-const dateComment = new Date();
+  // Обработчик клика кнопки "Написать"
+
+  buttonElement.addEventListener("click", () => {
+    nameInputElement.classList.remove("error");
+    commentInputElement.classList.remove("error");
+    if (nameInputElement.value === "") {
+      nameInputElement.classList.add("error");
+      return;
+    }
+    if (commentInputElement.value === "") {
+      commentInputElement.classList.add("error");
+      return;
+    };
+
+    fetch(
+      'https://wedev-api.sky.pro/api/v1/elena-kozlova/comments',
+      {
+        method: 'POST',
+        body: JSON.stringify(
+          {
+            text: commentInputElement.value,
+            name: nameInputElement.value,
+          })
+      }
+    ).then((response) => {
+      response.json().then((responseData) => {
+        comments = responseData.comments
+      })
+    });
+
+    nameInputElement.value = "";
+    commentInputElement.value = "";
+    renderComments();
+  });
+
+  // Добавляем дату нового комментария
+  const functionDate = () => {
+    const dateComment = new Date();
     const formatDate = dateComment.getDate().toString().padStart(2, '0') + '.' +
       (dateComment.getMonth() + 1).toString().padStart(2, '0') + '.' +
       dateComment.getFullYear().toString().slice(-2) + ' ' +
       dateComment.getHours().toString().padStart(2, '0') + ':' +
       dateComment.getMinutes().toString().padStart(2, '0');
-  </script>
+    return formatDate
+  }
+
+</script>
+
 </html>
