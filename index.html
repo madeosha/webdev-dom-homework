@@ -166,6 +166,30 @@
       })
     });
 
+    const fetchNewPromise = fetch(
+    "https://wedev-api.sky.pro/api/v1/elena-kozlova/comments",
+    {
+      method: "GET"
+    }
+  );
+  fetchNewPromise.then((response) => {
+    const jsonNewPromise = response.json();
+    jsonNewPromise.then((responseData) => {
+      const appComments = responseData.comments.map((comment) => {
+        const dateComment = new Date(comment.date);
+        return {
+          name: comment.author.name,
+          date: functionDate(),
+          textComment: comment.text,
+          likes: comment.likes,
+          isActiveLike: false
+        }
+      })
+      comments = appComments;
+      renderComments();
+    })
+  });
+
     nameInputElement.value = "";
     commentInputElement.value = "";
     renderComments();
