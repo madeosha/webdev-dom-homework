@@ -68,11 +68,13 @@ const fetchComments = () => {
     const appComments = responseData.comments.map((comment) => {
         const dateComment = new Date(comment.date);
           return {
+            id:0,
             name: comment.author.name,
             date: functionDate(),
             textComment: comment.text,
             likes: comment.likes,
-            isActiveLike: false
+            isActiveLike: false,
+            isEdit: false
           }
       })
       comments = appComments;
@@ -94,10 +96,15 @@ const renderComments = () => {
         <div>${comment.date}</div>
       </div>
       <div class="comment-body">
-        <div class="comment-text">${comment.textComment}</div>
+        <div class="${comment.isEdit ? 'none-visible' : 'comment-text'}">
+          ${comment.textComment}
+        </div>
+        <textarea class="${comment.isEdit ? 'edit-textarea' : 'none-visible'}" data-index="${index}">
+          ${comment.textComment}
+        </textarea>
       </div>
       <div class="comment-footer">
-        
+        <button class="edit-button">${comment.isEdit ? 'Сохранить' : 'Редактировать'}</button>
         <div class="likes">
           <span class="likes-counter">${comment.likes}</span>
           <button class="likes-button ${likeActive}" data-index="${index}"></button>
@@ -127,15 +134,27 @@ const renderComments = () => {
 
   // Добавляет кнопку редактирования комментария
 
-  // const edit = () => {
-  //   const editButtons = document.querySelectorAll('.edit-button');
+  const edit = () => {
+    const editButtons = document.querySelectorAll('.edit-button');
+    const commentBody = document.querySelectorAll('.comment-body');
 
-  //   editButtons.forEach((button) => {
-  //     button.addEventListener('click', () => {
+    editButtons.forEach((button, index) => {
+      button.addEventListener('click', (e) => {
+        e.stopPropagation()
+        const commentBodyElem = commentBody[index];
+        const comment = comments[index];
 
-  //     })
-  //   })
-  // }
+        if (comment.isEdit) {
+          const textarea = document.querySelector('.edit-textarea');
+          const newComment = textarea.value;
+          comment.textComment = newComment;
+        }
+
+        comment.isEdit = !comment.isEdit;
+        renderComments();
+      })
+    });
+  }
 
   // Добавляем обработчик клика на комментарий (ответ на комментарий)
 
@@ -152,7 +171,7 @@ const renderComments = () => {
   listElement.innerHTML = commentsHtml;
   like();
   initAnswer();
-  // edit();
+  edit();
 };
 
 fetchComments();
