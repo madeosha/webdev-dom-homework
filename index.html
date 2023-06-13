@@ -32,171 +32,18 @@
   }
 </style>
 <script>
-  "use strict";
+"use strict";
 
-  // Получаем доступ к разметке html в JS
+// Получаем доступ к разметке html в JS
 
+const buttonElement = document.getElementById("add-button");
+const nameInputElement = document.getElementById("name-input");
+const commentInputElement = document.getElementById("comment-input");
+const listElement = document.getElementById("list");
+const editButton = document.querySelector("edit-button");
 
-  const buttonElement = document.getElementById("add-button");
-  const nameInputElement = document.getElementById("name-input");
-  const commentInputElement = document.getElementById("comment-input");
-  const listElement = document.getElementById("list");
-
-  // Получаем данные из API
-
-  let comments = [];
-
-  const fetchPromise = fetch(
-    "https://wedev-api.sky.pro/api/v1/elena-kozlova/comments",
-    {
-      method: "GET"
-    }
-  );
-  fetchPromise.then((response) => {
-    const jsonPromise = response.json();
-    jsonPromise.then((responseData) => {
-      const appComments = responseData.comments.map((comment) => {
-        const dateComment = new Date(comment.date);
-        return {
-          name: comment.author.name,
-          date: functionDate(),
-          textComment: comment.text,
-          likes: comment.likes,
-          isActiveLike: false
-        }
-      })
-      comments = appComments;
-      renderComments();
-    })
-  });
-
-  // Создаём рендер-функцию для добавления разметки html в JS
-
-  const renderComments = () => {
-
-    const commentsHtml = comments.map((comment, index) => {
-      let likeActive = '';
-      if (comments[index].isActiveLike) {
-        likeActive = '-active-like';
-      }
-      return `<li class="comment">
-      <div class="comment-header">
-        <div>${comment.name}</div>
-        <div>${comment.date}</div>
-      </div>
-      <div class="comment-body">
-        <div class="comment-text">${comment.textComment}</div>
-      </div>
-      <div class="comment-footer">
-        <div class="likes">
-          <span class="likes-counter">${comment.likes}</span>
-          <button class="likes-button ${likeActive}" data-index="${index}"></button>
-        </div>
-      </div>
-      </li>`;
-    }).join('');
-
-    // Добавляем функцию активности лайка
-
-    const like = () => {
-      const likeButtons = document.querySelectorAll('.likes-button');
-      for (const likeButton of likeButtons) {
-        likeButton.addEventListener('click', (e) => {
-          e.stopPropagation()
-          const index = likeButton.dataset.index;
-          if (comments[index].isActiveLike) {
-            comments[index].likes--;
-
-          } else {
-            comments[index].likes++;
-          }
-          comments[index].isActiveLike = !comments[index].isActiveLike;
-          renderComments();
-        })
-      }
-    };
-
-    // Добавляем обработчик клика на комментарий (ответ на комментарий)
-
-    const initAnswer = () => {
-      const commentsElements = document.querySelectorAll(".comment");
-      for (const commentElement of commentsElements) {
-        commentElement.addEventListener('click', () => {
-          commentInputElement.value = `> ${commentElement.querySelector('.comment-text').innerHTML}`
-            + `\n\n${commentElement.querySelector('.comment-header').children[0].innerHTML}`
-        })
-      }
-    };
-
-    listElement.innerHTML = commentsHtml;
-    like();
-    initAnswer();
-  };
-
-  renderComments();
-
-
-  // Обработчик клика кнопки "Написать"
-
-  buttonElement.addEventListener("click", () => {
-    nameInputElement.classList.remove("error");
-    commentInputElement.classList.remove("error");
-    if (nameInputElement.value === "") {
-      nameInputElement.classList.add("error");
-      return;
-    }
-    if (commentInputElement.value === "") {
-      commentInputElement.classList.add("error");
-      return;
-    };
-
-    fetch(
-      'https://wedev-api.sky.pro/api/v1/elena-kozlova/comments',
-      {
-        method: 'POST',
-        body: JSON.stringify(
-          {
-            text: commentInputElement.value,
-            name: nameInputElement.value,
-          })
-      }
-    ).then((response) => {
-      response.json().then((responseData) => {
-        comments = responseData.comments
-      })
-    });
-
-    const fetchNewPromise = fetch(
-    "https://wedev-api.sky.pro/api/v1/elena-kozlova/comments",
-    {
-      method: "GET"
-    }
-  );
-  fetchNewPromise.then((response) => {
-    const jsonNewPromise = response.json();
-    jsonNewPromise.then((responseData) => {
-      const appComments = responseData.comments.map((comment) => {
-        const dateComment = new Date(comment.date);
-        return {
-          name: comment.author.name,
-          date: functionDate(),
-          textComment: comment.text,
-          likes: comment.likes,
-          isActiveLike: false
-        }
-      })
-      comments = appComments;
-      renderComments();
-    })
-  });
-
-    nameInputElement.value = "";
-    commentInputElement.value = "";
-    renderComments();
-  });
-
-  // Добавляем дату нового комментария
-  const functionDate = () => {
+ // Добавляем дату нового комментария
+ const functionDate = () => {
     const dateComment = new Date();
     const formatDate = dateComment.getDate().toString().padStart(2, '0') + '.' +
       (dateComment.getMonth() + 1).toString().padStart(2, '0') + '.' +
@@ -206,6 +53,151 @@
     return formatDate
   }
 
-</script>
+// Получаем данные из API
 
+let comments = [];
+
+const fetchComments = () => {
+  const fetchPromise = fetch("https://wedev-api.sky.pro/api/v1/elena-kozlova/comments", {
+      method: "GET",
+  })
+    .then((response) => {
+      return response.json();
+    })
+    .then((responseData) => {
+    const appComments = responseData.comments.map((comment) => {
+        const dateComment = new Date(comment.date);
+          return {
+            name: comment.author.name,
+            date: functionDate(),
+            textComment: comment.text,
+            likes: comment.likes,
+            isActiveLike: false
+          }
+      })
+      comments = appComments;
+      renderComments();
+    })
+};
+
+// Создаём рендер-функцию для добавления разметки html в JS
+
+const renderComments = () => {
+  const commentsHtml = comments.map((comment, index) => {
+    let likeActive = '';
+    if (comments[index].isActiveLike) {
+      likeActive = '-active-like';
+    }
+    return `<li class="comment">
+      <div class="comment-header">
+        <div>${comment.name}</div>
+        <div>${comment.date}</div>
+      </div>
+      <div class="comment-body">
+        <div class="comment-text">${comment.textComment}</div>
+      </div>
+      <div class="comment-footer">
+        
+        <div class="likes">
+          <span class="likes-counter">${comment.likes}</span>
+          <button class="likes-button ${likeActive}" data-index="${index}"></button>
+        </div>
+      </div>
+      </li>`;
+  }).join('');
+
+  // Добавляем функцию активности лайка
+
+  const like = () => {
+    const likeButtons = document.querySelectorAll('.likes-button');
+    for (const likeButton of likeButtons) {
+      likeButton.addEventListener('click', (e) => {
+        e.stopPropagation()
+        const index = likeButton.dataset.index;
+        if (comments[index].isActiveLike) {
+          comments[index].likes--;
+        } else {
+          comments[index].likes++;
+        }
+        comments[index].isActiveLike = !comments[index].isActiveLike;
+        renderComments();
+      })
+    }
+  };
+
+  // Добавляет кнопку редактирования комментария
+
+  // const edit = () => {
+  //   const editButtons = document.querySelectorAll('.edit-button');
+
+  //   editButtons.forEach((button) => {
+  //     button.addEventListener('click', () => {
+
+  //     })
+  //   })
+  // }
+
+  // Добавляем обработчик клика на комментарий (ответ на комментарий)
+
+  const initAnswer = () => {
+    const commentsElements = document.querySelectorAll(".comment");
+    for (const commentElement of commentsElements) {
+      commentElement.addEventListener('click', () => {
+        commentInputElement.value = `> ${commentElement.querySelector('.comment-text').innerHTML}`
+          + `\n\n${commentElement.querySelector('.comment-header').children[0].innerHTML}`
+      })
+    }
+  };
+
+  listElement.innerHTML = commentsHtml;
+  like();
+  initAnswer();
+  // edit();
+};
+
+fetchComments();
+renderComments();
+
+// Обработчик клика кнопки "Написать"
+
+buttonElement.addEventListener("click", () => {
+  nameInputElement.classList.remove("error");
+  commentInputElement.classList.remove("error");
+    if (nameInputElement.value === "") {
+      nameInputElement.classList.add("error");
+      return;
+    }
+    if (commentInputElement.value === "") {
+      commentInputElement.classList.add("error");
+      return;
+    };
+
+  buttonElement.disabled = true;
+  buttonElement.textContent = 'Комментарий добавляется';
+
+  fetch('https://wedev-api.sky.pro/api/v1/elena-kozlova/comments', {
+    method: 'POST',
+    body: JSON.stringify({
+      text: commentInputElement.value,
+      name: nameInputElement.value,
+    }),
+  })
+    .then((response) => {
+      return response.json();
+    })
+    .then((responseData) => {
+      return comments = responseData.comments;
+    })
+    .then(() => {
+      buttonElement.disabled = false;
+      buttonElement.textContent = 'Написать';
+      fetchComments();
+    })
+    
+  nameInputElement.value = "";
+  commentInputElement.value = "";
+  renderComments();
+});
+
+</script>
 </html>
