@@ -158,3 +158,13 @@ body {
   .none-visible {
     display: none;
   }
+
+  .loading-text {
+    font-family: Helvetica;
+    color: #ffffff;
+    font-size: 32px;
+  }
+  
+  .-loading-like {
+    animation: rotating 2s linear infinite;
+  }
