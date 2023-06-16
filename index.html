@@ -18,6 +18,7 @@
         rows="4"></textarea>
       <div class="add-form-row">
         <button class="add-form-button" id="add-button">Написать</button>
+        <button class="add-form-button" id="delComment">Удалить комментарий</button>
       </div>
     </div>
   </div>
@@ -43,7 +44,8 @@ const listElement = document.getElementById("list");
 const editButton = document.querySelector("edit-button");
 
  // Добавляем дату нового комментария
- const functionDate = () => {
+ 
+const functionDate = () => {
     const dateComment = new Date();
     const formatDate = dateComment.getDate().toString().padStart(2, '0') + '.' +
       (dateComment.getMonth() + 1).toString().padStart(2, '0') + '.' +
@@ -51,7 +53,7 @@ const editButton = document.querySelector("edit-button");
       dateComment.getHours().toString().padStart(2, '0') + ':' +
       dateComment.getMinutes().toString().padStart(2, '0');
     return formatDate
-  }
+}
 
 // Получаем данные из API
 
@@ -62,7 +64,12 @@ const fetchComments = () => {
       method: "GET",
   })
     .then((response) => {
-      return response.json();
+      if (response.status === 200) {
+        return response.json();
+      } else {
+        return Promise.reject("Сервер упал");
+        //throw new Error("Сервер упал");
+      }
     })
     .then((responseData) => {
     const appComments = responseData.comments.map((comment) => {
@@ -80,6 +87,12 @@ const fetchComments = () => {
       comments = appComments;
       renderComments();
     })
+    .catch((error) => {
+      buttonElement.disabled = false;
+      buttonElement.textContent = 'Написать';
+      alert("Упс, у тебя пропал интернет, попробуй написать еще раз чуть позже");
+      console.warn(error);
+    });
 };
 
 // Создаём рендер-функцию для добавления разметки html в JS
@@ -156,6 +169,14 @@ const renderComments = () => {
     });
   }
 
+  // Отправка коммента с помощью кнопки Enter
+
+  document.addEventListener('keyup', (event) => {
+    if (event.key === "Enter") {
+      buttonElement.click()
+    }
+  });
+  
   // Добавляем обработчик клика на комментарий (ответ на комментарий)
 
   const initAnswer = () => {
@@ -194,27 +215,49 @@ buttonElement.addEventListener("click", () => {
   buttonElement.disabled = true;
   buttonElement.textContent = 'Комментарий добавляется';
 
+  //Удаление последнего комментария
+
+  const deleteComment = document.getElementById('delComment');
+  deleteComment.addEventListener('click', () => {
+    const lastCommentIndex = listElement.innerHTML.lastIndexOf(`<li class="comment">`);
+    if (lastCommentIndex !== -1) {
+      listElement.innerHTML = listElement.innerHTML.substring(0, lastCommentIndex)
+    }
+    comments.pop();
+    renderComments();
+  });
+
   fetch('https://wedev-api.sky.pro/api/v1/elena-kozlova/comments', {
     method: 'POST',
     body: JSON.stringify({
       text: commentInputElement.value,
       name: nameInputElement.value,
+//      forceError: true,
     }),
   })
     .then((response) => {
-      return response.json();
+      if (response.status === 201) {
+        return response.json();
+      } else {
+        return Promise.reject("Сервер упал");
+      }
     })
     .then((responseData) => {
-      return comments = responseData.comments;
+      fetchComments();
     })
     .then(() => {
       buttonElement.disabled = false;
       buttonElement.textContent = 'Написать';
-      fetchComments();
+      nameInputElement.value = "";
+      commentInputElement.value = "";
     })
-    
-  nameInputElement.value = "";
-  commentInputElement.value = "";
+    .catch((error) => {
+    buttonElement.disabled = false;
+    buttonElement.textContent = 'Написать';
+    alert("Упс, у тебя пропал интернет, попробуй написать еще раз чуть позже");
+    console.warn(error);
+   });
+  
   renderComments();
 });
 
