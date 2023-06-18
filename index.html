@@ -128,19 +128,23 @@ buttonElement.addEventListener("click", () => {
         body: JSON.stringify({
           text: protectionHtml(commentInputElement.value),
           name: protectionHtml(nameInputElement.value),
-          forceError: true,
+          forceError: false,
         })
       })
       .then((response) => {
         if (response.status === 201) {
           return response.json();
         } else if (response.status === 400) {
-            throw new Error("Плохой запрос")
             alert("Вы ввели слишком короткое имя или текст комментария");
+            throw new Error("Плохой запрос")
+            
         } else if (response.status === 500) {
-            throw new Error("Ошибка сервера")
             alert("Сервер сломался");
-        } 
+            throw new Error("Ошибка сервера")
+        } else {
+          alert("Кажется, что-то пошло не так, попробуйте позже");
+          throw new Error("У пользователя пропал интернет");
+        }
       })
       .then((responseData) => {
         comments = responseData.comments;
@@ -158,7 +162,9 @@ buttonElement.addEventListener("click", () => {
         } else if (error.message === "Ошибка сервера") {
           alert("Сервер сломался");
           postComment();
-        } 
+        } else {
+          alert("Кажется, что-то пошло не так, попробуйте позже");
+        }
       });
     buttonElement.disabled = true;
     buttonElement.textContent = 'Комментарий добавляется';
