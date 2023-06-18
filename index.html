@@ -140,9 +140,7 @@ buttonElement.addEventListener("click", () => {
         } else if (response.status === 500) {
             throw new Error("Ошибка сервера")
             alert("Сервер сломался");
-        } else {
-            throw new Error('Сервер не отвечает')
-        }
+        } 
       })
       .then((responseData) => {
         comments = responseData.comments;
@@ -159,9 +157,8 @@ buttonElement.addEventListener("click", () => {
           alert('Вы ввели слишком короткое имя или текст комментария')
         } else if (error.message === "Ошибка сервера") {
           alert("Сервер сломался");
-        } else if (error.message === "Сервер не отвечает") {
           postComment();
-        }
+        } 
       });
     buttonElement.disabled = true;
     buttonElement.textContent = 'Комментарий добавляется';
