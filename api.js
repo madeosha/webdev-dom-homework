@@ -62,14 +62,10 @@ const postComment = () => {
         if (response.status === 201) {
           return response.json();
         } else if (response.status === 400) {
-            alert("Вы ввели слишком короткое имя или текст комментария");
             throw new Error("Плохой запрос")
-            
         } else if (response.status === 500) {
-            alert("Сервер сломался");
             throw new Error("Ошибка сервера")
         } else {
-          alert("Кажется, что-то пошло не так, попробуйте позже");
           throw new Error("У пользователя пропал интернет");
         }
       })

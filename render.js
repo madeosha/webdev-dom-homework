@@ -43,7 +43,7 @@ const renderComments = (commentsArr) => {
     commentInputElement.value = '';
   
     like(commentsArr);
-    initAnswer();
+    initAnswer(commentsArr);
     edit(commentsArr);      
 };
 

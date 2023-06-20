@@ -60,7 +60,7 @@ nameInputElement.addEventListener('input', () => {
 
 //Удаление последнего комментария
 const deleteComment = document.getElementById('delComment');
-  deleteComment.addEventListener('click', (commentsArr) => {
+  deleteComment.addEventListener('click', () => {
     const lastCommentIndex = listElement.innerHTML.lastIndexOf(`<li class="comment">`);
     if (lastCommentIndex !== -1) {
       listElement.innerHTML = listElement.innerHTML.substring(0, lastCommentIndex)
@@ -72,7 +72,7 @@ const deleteComment = document.getElementById('delComment');
 fetchComments();
 
 // Экспорт данных в модули
-export { nameInputElement, commentInputElement, editButton, listElement, buttonElement, loadingListElement, loadingCommentElement, addFormElement, comments, DateFormatComment };
+export { nameInputElement, commentInputElement, editButton, listElement, buttonElement, loadingListElement, loadingCommentElement, addFormElement, comments, DateFormatComment, deleteComment };
 
 
 
