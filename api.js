@@ -16,10 +16,10 @@ function fetchComments() {
     })
   }
 
-  const convertServer = (response, commentsArr) => {
+  const convertServer = (response, comments) => {
     return response.json().then((responseData) => {
-      commentsArr = responseData.comments;
-      commentsArr = commentsArr.map((comment) => {
+      comments = responseData.comments;
+      comments = comments.map((comment) => {
         return {
           id:0,
           name: comment.author.name,
@@ -30,7 +30,7 @@ function fetchComments() {
           isEdit: false
         }
       });
-      renderComments(commentsArr);
+      renderComments(comments);
     })
   }
     

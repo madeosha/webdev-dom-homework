@@ -5,10 +5,10 @@ import {nameInputElement, commentInputElement, listElement, loadingListElement, 
 import {like, initAnswer, edit} from "./option.js"
 
 // Создаём рендер-функцию для добавления разметки html в JS
-const renderComments = (commentsArr) => {
-    const commentsHtml = commentsArr.map((comment, index) => {
+const renderComments = (comments) => {
+    const commentsHtml = comments.map((comment, index) => {
       let likeActive = '';
-      if (commentsArr[index].isActiveLike) {
+      if (comments[index].isActiveLike) {
         likeActive = '-active-like';
       }
       return `<li class="comment">
@@ -42,9 +42,9 @@ const renderComments = (commentsArr) => {
     nameInputElement.value = '';
     commentInputElement.value = '';
   
-    like(commentsArr);
-    initAnswer(commentsArr);
-    edit(commentsArr);      
+    like(comments);
+    initAnswer();
+    edit(comments);      
 };
 
 // Экспорт данных в модули

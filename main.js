@@ -66,9 +66,9 @@ const deleteComment = document.getElementById('delComment');
       listElement.innerHTML = listElement.innerHTML.substring(0, lastCommentIndex)
     }
     comments.pop();
-    renderComments(commentsArr);
   });
-
+  
+renderComments(comments);
 fetchComments();
 
 // Экспорт данных в модули
