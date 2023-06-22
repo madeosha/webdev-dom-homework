@@ -43,8 +43,8 @@ const renderComments = (comments) => {
     commentInputElement.value = '';
   
     like(comments);
+    edit(comments); 
     initAnswer();
-    edit(comments);      
 };
 
 // Экспорт данных в модули

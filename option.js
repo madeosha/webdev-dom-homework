@@ -35,7 +35,8 @@ const initAnswer = () => {
     const commentsElements = document.querySelectorAll(".comment");
     for (const commentElement of commentsElements) {
         commentElement.addEventListener('click', () => {
-          //if (document.querySelectorAll(".comment") === null) break;
+          console.log("initAnswer");
+          if (document.querySelector(".comment-text") === null) return;
           commentInputElement.value = `> ${commentElement.querySelector('.comment-text').innerHTML.replaceAll("&amp", "&;").replaceAll("&lt;", "<").replaceAll("&gt;", ">").replaceAll("&quot;", '"')}`
             + `\n\n${commentElement.querySelector('.comment-header').children[0].innerHTML.replaceAll("&amp", "&;").replaceAll("&lt;", "<").replaceAll("&gt;", ">").replaceAll("&quot;", '"')}`
         })
@@ -49,6 +50,7 @@ const edit = (comments) => {
 
     editButtons.forEach((button, index) => {
       button.addEventListener('click', (e) => {
+        console.log("edit");
         e.stopPropagation()
         const commentBodyElem = commentBody[index];
         const comment = comments[index];
