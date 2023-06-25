@@ -60,6 +60,8 @@ const postComment = () => {
     })
       .then((response) => {
         if (response.status === 201) {
+          nameInputElement.classList.remove('error');
+          commentInputElement.classList.remove('error');
           return response.json();
         } else if (response.status === 400) {
             throw new Error("Плохой запрос")

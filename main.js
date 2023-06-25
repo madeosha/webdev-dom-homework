@@ -35,17 +35,7 @@ const DateFormatComment = (commentDate) => {
 buttonElement.addEventListener("click", () => {
   loadingCommentElement.style.display = 'block';
   addFormElement.style.display = 'none';
-  nameInputElement.classList.remove("error");
-  commentInputElement.classList.remove("error");
-    if (nameInputElement.value === "") {
-      nameInputElement.classList.add("error");
-      return;
-    }
-    if (commentInputElement.value === "") {
-      commentInputElement.classList.add("error");
-      return;
-    };
-    postComment()
+  postComment()
 });
 
 // Активность кнопки "Написать"
