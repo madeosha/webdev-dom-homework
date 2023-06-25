@@ -7,7 +7,7 @@ import { renderComments } from './render.js'
 // Получение данные из API
 function fetchComments() {
     return fetch(
-      "https://wedev-api.sky.pro/api/v1/elena-kozlova/comments", 
+      "https://wedev-api.sky.pro/api/v2/elena-kozlova/comments", 
       {
         method: "GET",
       })
@@ -48,7 +48,7 @@ const postComment = () => {
 
   // Добавляем новый комментарий в API
     return fetch(
-      "https://wedev-api.sky.pro/api/v1/elena-kozlova/comments", 
+      "https://wedev-api.sky.pro/api/v2/elena-kozlova/comments", 
       {
       method: 'POST',
       body: JSON.stringify(
