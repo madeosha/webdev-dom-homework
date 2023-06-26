@@ -6,10 +6,14 @@ import { renderComments } from './render.js'
 
 // Получение данные из API
 function fetchComments() {
+    let token = "Bearer asb4c4boc86gasb4c4boc86g37w3cc3bo3b83k4g37k3bk3cg3c03ck4k";
     return fetch(
       "https://wedev-api.sky.pro/api/v2/elena-kozlova/comments", 
       {
         method: "GET",
+        headers: {
+          Authorization: token,
+        },
       })
     .then((response) => {
       convertServer(response, comments)
@@ -51,12 +55,14 @@ const postComment = () => {
       "https://wedev-api.sky.pro/api/v2/elena-kozlova/comments", 
       {
       method: 'POST',
-      body: JSON.stringify(
-        {
+      body: JSON.stringify({
         text: protectionHtml(commentInputElement.value),
         name: protectionHtml(nameInputElement.value),
         forceError: false,
-        })
+      }),
+      headers: {
+        Authorization: token,
+      },
     })
       .then((response) => {
         if (response.status === 201) {
@@ -64,9 +70,11 @@ const postComment = () => {
           commentInputElement.classList.remove('error');
           return response.json();
         } else if (response.status === 400) {
-            throw new Error("Плохой запрос")
+          throw new Error("Плохой запрос")
+//        } else if (response.status === 401) {
+//          throw new Error("Нет авторизации")
         } else if (response.status === 500) {
-            throw new Error("Ошибка сервера")
+          throw new Error("Ошибка сервера")
         } else {
           throw new Error("У пользователя пропал интернет");
         }
@@ -84,6 +92,8 @@ const postComment = () => {
           commentInputElement.classList.add('error');
           nameInputElement.classList.add('error');
           alert('Вы ввели слишком короткое имя или текст комментария')
+//        } else if (error.message === "Нет авторизации") {
+//          alert('Пожалуйста, зарегистрируйтесь')
         } else if (error.message === "Ошибка сервера") {
           alert("Сервер сломался");
           postComment(comments);
