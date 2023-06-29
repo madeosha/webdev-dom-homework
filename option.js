@@ -1,7 +1,6 @@
 "use strict";
 
 // Импорт данных из модулей
-import { commentInputElement, buttonElement } from './main.js';
 import { renderComments } from './render.js';
 
 // Отправка коммента с помощью кнопки Enter
@@ -12,7 +11,7 @@ document.addEventListener('keyup', (event) => {
 }); 
 
 // Добавляем функцию активности лайка
-const like = (comments) => {
+export const like = (comments) => {
     const likeButtons = document.querySelectorAll('.likes-button');
     for (const likeButton of likeButtons) {
       likeButton.addEventListener('click', (e) => {
@@ -29,28 +28,35 @@ const like = (comments) => {
     }
   };
 
-  // Добавляем обработчик клика на комментарий (ответ на комментарий)
-
-const initAnswer = () => {
-    const commentsElements = document.querySelectorAll(".comment");
-    for (const commentElement of commentsElements) {
-        commentElement.addEventListener('click', () => {
-          console.log("initAnswer");
-          if (document.querySelector(".comment-text") === null) return;
-          commentInputElement.value = `> ${commentElement.querySelector('.comment-text').innerHTML.replaceAll("&amp", "&;").replaceAll("&lt;", "<").replaceAll("&gt;", ">").replaceAll("&quot;", '"')}`
-            + `\n\n${commentElement.querySelector('.comment-header').children[0].innerHTML.replaceAll("&amp", "&;").replaceAll("&lt;", "<").replaceAll("&gt;", ">").replaceAll("&quot;", '"')}`
-        })
-    }
+  
+  // Обработчик клика на комментарий (ответ на комментарий)
+  export const initAnswer = () => {
+  const commentsElements = document.querySelectorAll(".comment");
+  const elementComment = document.getElementById('commentInput')
+  for (const commentElement of commentsElements) {
+    commentElement.addEventListener('click', () => {
+      if (document.querySelector(".comment-text") === null) return;
+      elementComment.value = `> ${commentElement.querySelector('.comment-text').innerHTML
+        .replaceAll("&amp", "&;")
+        .replaceAll("&lt;", "<")
+        .replaceAll("&gt;", ">")
+        .replaceAll("&quot;", '"')}`
+        + `\n\n${commentElement.querySelector('.comment-header').children[0].innerHTML
+          .replaceAll("&amp", "&;")
+          .replaceAll("&lt;", "<")
+          .replaceAll("&gt;", ">")
+          .replaceAll("&quot;", '"')}`
+    })
+  }
 };
 
-// Добавляет кнопку редактирования комментария
-const edit = (comments) => {
+  // Добавляет кнопку редактирования комментария
+  export const edit = (comments) => {
     const editButtons = document.querySelectorAll('.edit-button');
     const commentBody = document.querySelectorAll('.comment-body');
 
     editButtons.forEach((button, index) => {
       button.addEventListener('click', (e) => {
-        console.log("edit");
         e.stopPropagation()
         const commentBodyElem = commentBody[index];
         const comment = comments[index];
@@ -63,7 +69,5 @@ const edit = (comments) => {
         renderComments(comments);
       })
     });
-}
+  }
 
- // Экспорт данных в модули
- export { like, initAnswer, edit };

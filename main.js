@@ -1,31 +1,13 @@
 "use strict";
-// План
-    // 1. Реализовать форму логина в приложении
-    //* Перенести всю разметку в рендер функцию
-    // 2. Реализовать форму регистрации
-
-
 // Импорт данных из модулей
-import { renderComments } from './render.js'
-import { fetchComments, postComment} from "./api.js";
-
-// Получаем доступ к разметке html в JS
-const buttonElement = document.getElementById("add-button");
-const nameInputElement = document.getElementById("name-input");
-const commentInputElement = document.getElementById("comment-input");
-const listElement = document.getElementById("list");
-const editButton = document.querySelector("edit-button");
-const loadingListElement = document.getElementById('loadingList');
-const loadingCommentElement = document.getElementById('loadingComment');
-const addFormElement = document.getElementById('addForm')
+import { fetchAndRenderComments } from "./api.js";
 
 //  Массив в который будем рендерить полученные данные
 let comments = [];
 
-// Убираем обработчик загрузки с экрана
-loadingCommentElement.style.display = 'none';
+export let isPosting = false;
 
-// Добавляем дату нового комментария
+// Функция обработчика даты
 const DateFormatComment = (commentDate) => {
   const dateComment = new Date(commentDate);
   const formatDate = dateComment.getDate().toString().padStart(2, '0') + '.' +
@@ -33,41 +15,13 @@ const DateFormatComment = (commentDate) => {
     dateComment.getFullYear().toString().slice(-2) + ' ' +
     dateComment.getHours().toString().padStart(2, '0') + ':' +
     dateComment.getMinutes().toString().padStart(2, '0');
-    return formatDate
+  return formatDate
 }
 
-// Обработчик клика кнопки "Написать"
-buttonElement.addEventListener("click", () => {
-  loadingCommentElement.style.display = 'block';
-  addFormElement.style.display = 'none';
-  postComment()
-});
-
-// Активность кнопки "Написать"
-buttonElement.disabled = true;
-nameInputElement.addEventListener('input', () => {
-  if (nameInputElement.value.trim() !== "") {
-    buttonElement.disabled = false;
-  } else {
-    buttonElement.disabled = true;
-  }
-});
-
-//Удаление последнего комментария
-const deleteComment = document.getElementById('delComment');
-  deleteComment.addEventListener('click', () => {
-    const lastCommentIndex = listElement.innerHTML.lastIndexOf(`<li class="comment">`);
-    if (lastCommentIndex !== -1) {
-      listElement.innerHTML = listElement.innerHTML.substring(0, lastCommentIndex)
-    }
-    comments.pop();
-  });
-  
-renderComments(comments);
-fetchComments();
+fetchAndRenderComments();
 
 // Экспорт данных в модули
-export { nameInputElement, commentInputElement, editButton, listElement, buttonElement, loadingListElement, loadingCommentElement, addFormElement, comments, DateFormatComment, deleteComment };
+export { comments, DateFormatComment };
 
 
 
