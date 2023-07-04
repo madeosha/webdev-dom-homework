@@ -1,6 +1,7 @@
 "use strict";
 // Импорт данных из модулей
 import { fetchAndRenderComments } from "./api.js";
+import { format } from "date-fns";
 
 //  Массив в который будем рендерить полученные данные
 let comments = [];
